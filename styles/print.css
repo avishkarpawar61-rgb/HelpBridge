@@ -1,0 +1,160 @@
+/**
+ * HelpBridge AI — Emergency Handoff Card Print Stylesheet
+ * Optimized specifically for 1-page physical printing and "Save as PDF".
+ * Removes all UI chrome and formats a crisp, high-contrast 20-second ER summary.
+ */
+
+@media print {
+  /* Hide non-printable elements */
+  .no-print,
+  .app-header,
+  .app-footer,
+  .layout-input-column,
+  .urgency-banner,
+  .metrics-strip,
+  .summary-card,
+  .action-card,
+  .facts-card,
+  .meds-card,
+  .abnormal-card,
+  .questions-card,
+  .verification-card,
+  .follow-up-card,
+  .before-after-bar,
+  .raw-before-container,
+  .empty-welcome-card,
+  .modal-backdrop,
+  #images-preview-strip,
+  #docs-preview-strip {
+    display: none !important;
+  }
+
+  /* Reset page layout */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .main-content-layout,
+  .layout-grid,
+  .layout-results-column,
+  .results-wrapper,
+  .structured-plan-flow {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .emergency-handoff-container {
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* The printable emergency card */
+  #printable-emergency-card {
+    display: block !important;
+    border: 2px solid #000000 !important;
+    border-radius: 4px !important;
+    padding: 12mm !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .card-print-header {
+    border-bottom: 2px solid #000000 !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .print-brand {
+    font-size: 14pt !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+  }
+
+  .print-meta {
+    font-size: 9pt !important;
+    color: #333333 !important;
+  }
+
+  .attention-badge {
+    border: 1px solid #000000 !important;
+    background: #eeeeee !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    padding: 2px 6px !important;
+  }
+
+  .badge-emergency {
+    background: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  .handoff-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .cell-full {
+    grid-column: span 2 !important;
+  }
+
+  .grid-cell {
+    background: #ffffff !important;
+    border: 1px solid #444444 !important;
+    padding: 8px !important;
+  }
+
+  .cell-label {
+    font-size: 8pt !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .cell-highlight {
+    font-size: 11pt !important;
+    font-weight: 600 !important;
+    color: #000000 !important;
+  }
+
+  .handoff-pill-list li,
+  .pill-allergy {
+    background: #ffffff !important;
+    border: 1px solid #666666 !important;
+    color: #000000 !important;
+    font-size: 9pt !important;
+    padding: 2px 6px !important;
+  }
+
+  .handoff-meds-list li,
+  .handoff-findings-list li {
+    font-size: 9pt !important;
+    color: #000000 !important;
+  }
+
+  .handoff-footer {
+    margin-top: 10px !important;
+    border-top: 1px dashed #666666 !important;
+    padding-top: 6px !important;
+    font-size: 7.5pt !important;
+    color: #333333 !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}

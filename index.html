@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d9488" />
+  <meta name="description" content="HelpBridge AI converts messy, unstructured medical records, blurry handwritten doctor prescriptions, lab test reports, and voice notes into a verified Care Plan and a 20-second Emergency Handoff Card using Google Gemini." />
+  <meta name="keywords" content="HelpBridge AI, medical triage, emergency handoff card, prescription OCR, Gemini API, healthcare AI, PromptWars" />
+
+  <title>HelpBridge AI — From Problems to Action</title>
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet" />
+
+  <!-- FontAwesome 6 for Clinical & UI Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./styles/main.css" />
+  <link rel="stylesheet" href="./styles/components.css" />
+  <link rel="stylesheet" href="./styles/print.css" />
+</head>
+<body>
+  <!-- Dynamic Application Root -->
+  <div id="app-root">
+    <div style="display:flex; justify-content:center; align-items:center; min-height:80vh; font-family:sans-serif; color:#0f766e;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size:2rem; margin-right:1rem;"></i>
+      <span>Loading HelpBridge AI...</span>
+    </div>
+  </div>
+
+  <!-- Main ES Module Entry Point -->
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
