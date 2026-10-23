@@ -101,15 +101,29 @@ async function callGeminiApi({ apiKey, model, systemInstruction, contents, respo
 }
 
 /**
+ * Extracts JSON block from text even if model adds conversational preamble or markdown fences
+ */
+function extractJsonString(text) {
+  if (!text) return '';
+  let cleaned = text.trim();
+  const blockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  if (blockMatch && blockMatch[1]) {
+    return blockMatch[1].trim();
+  }
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return cleaned.substring(firstBrace, lastBrace + 1).trim();
+  }
+  return cleaned;
+}
+
+/**
  * Safely parses JSON string, with 1 automatic repair retry if needed
  */
 async function parseJsonWithRepair({ rawJsonText, apiKey, model, expectedType = 'synthesis' }) {
   try {
-    // Strip markdown code fences if present
-    let cleaned = rawJsonText.trim();
-    if (cleaned.startsWith('```json')) cleaned = cleaned.replace(/^```json\s*/, '');
-    if (cleaned.startsWith('```')) cleaned = cleaned.replace(/^```\s*/, '');
-    if (cleaned.endsWith('```')) cleaned = cleaned.replace(/\s*```$/, '');
+    const cleaned = extractJsonString(rawJsonText);
     return JSON.parse(cleaned);
   } catch (initialErr) {
     console.warn(`JSON parse failed for ${expectedType}. Initiating automatic repair request...`, initialErr);
@@ -129,10 +143,7 @@ Fix all syntax errors (unescaped quotes, trailing commas, missing brackets) and 
       temperature: 0.0
     });
 
-    let cleanedRepaired = repairedText.trim();
-    if (cleanedRepaired.startsWith('```json')) cleanedRepaired = cleanedRepaired.replace(/^```json\s*/, '');
-    if (cleanedRepaired.startsWith('```')) cleanedRepaired = cleanedRepaired.replace(/^```\s*/, '');
-    if (cleanedRepaired.endsWith('```')) cleanedRepaired = cleanedRepaired.replace(/\s*```$/, '');
+    const cleanedRepaired = extractJsonString(repairedText);
     return JSON.parse(cleanedRepaired);
   }
 }

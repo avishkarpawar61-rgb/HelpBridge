@@ -83,45 +83,53 @@ export function attachApiKeyModalEvents(onKeyUpdated) {
   const eyeIcon = document.getElementById('eye-icon');
   const persistCb = document.getElementById('persist-key-cb');
 
-  if (openBtn && modal) {
-    openBtn.addEventListener('click', () => {
-      if (keyInput) keyInput.value = store.getApiKey();
-      modal.style.display = 'flex';
-    });
-  }
+  if (modal && !modal.dataset.bound) {
+    modal.dataset.bound = 'true';
 
-  [closeBtn, cancelBtn].forEach(btn => {
-    if (btn && modal) {
-      btn.addEventListener('click', () => { modal.style.display = 'none'; });
+    if (openBtn) {
+      openBtn.addEventListener('click', () => {
+        if (keyInput) keyInput.value = store.getApiKey();
+        modal.style.display = 'flex';
+      });
     }
-  });
 
-  if (toggleVisibilityBtn && keyInput && eyeIcon) {
-    toggleVisibilityBtn.addEventListener('click', () => {
-      const isPassword = keyInput.type === 'password';
-      keyInput.type = isPassword ? 'text' : 'password';
-      eyeIcon.className = isPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
-    });
-  }
-
-  if (saveBtn && keyInput) {
-    saveBtn.addEventListener('click', () => {
-      const newKey = keyInput.value.trim();
-      const shouldPersist = persistCb ? persistCb.checked : false;
-      store.setApiKey(newKey, shouldPersist);
-
-      if (modelSelect) {
-        setSelectedModel(modelSelect.value);
+    [closeBtn, cancelBtn].forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', () => { modal.style.display = 'none'; });
       }
-
-      modal.style.display = 'none';
-      if (onKeyUpdated) onKeyUpdated(newKey);
     });
-  }
 
-  if (modal) {
+    if (toggleVisibilityBtn && keyInput && eyeIcon) {
+      toggleVisibilityBtn.addEventListener('click', () => {
+        const isPassword = keyInput.type === 'password';
+        keyInput.type = isPassword ? 'text' : 'password';
+        eyeIcon.className = isPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+      });
+    }
+
+    if (saveBtn && keyInput) {
+      saveBtn.addEventListener('click', () => {
+        const newKey = keyInput.value.trim();
+        const shouldPersist = persistCb ? persistCb.checked : false;
+        store.setApiKey(newKey, shouldPersist);
+
+        if (modelSelect) {
+          setSelectedModel(modelSelect.value);
+        }
+
+        modal.style.display = 'none';
+        if (onKeyUpdated) onKeyUpdated(newKey);
+      });
+    }
+
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.style.display = 'none';
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display !== 'none') {
+        modal.style.display = 'none';
+      }
     });
   }
 }

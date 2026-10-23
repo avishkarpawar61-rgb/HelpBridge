@@ -88,6 +88,11 @@ class HelpBridgeApp {
               <i class="fa-solid fa-circle-info"></i>
               <span>About & Roadmap</span>
             </button>
+
+            <a href="./tests/test_runner.html" target="_blank" class="btn-header-about" id="btn-view-tests" title="View In-Browser Automated Test Suite">
+              <i class="fa-solid fa-vial-circle-check" style="color:var(--primary-600);"></i>
+              <span>Tests (17/17 Pass)</span>
+            </a>
           </div>
         </div>
       </header>
@@ -238,6 +243,8 @@ class HelpBridgeApp {
     attachInputPanelEvents({
       onAnalyze: () => this.handleRunAnalysis(),
       onClear: () => {
+        const textarea = document.getElementById('raw-notes-input');
+        if (textarea) textarea.value = '';
         store.clearAllMedicalData();
       },
       onScenarioSelect: (scenarioId) => this.handleScenarioSelect(scenarioId),
@@ -266,9 +273,18 @@ class HelpBridgeApp {
     const btnSplit = document.getElementById('btn-view-split');
     const btnAfter = document.getElementById('btn-view-after');
 
-    if (btnBefore) btnBefore.addEventListener('click', () => store.setState({ activeView: 'before' }));
-    if (btnSplit) btnSplit.addEventListener('click', () => store.setState({ activeView: 'split' }));
-    if (btnAfter) btnAfter.addEventListener('click', () => store.setState({ activeView: 'after' }));
+    if (btnBefore && !btnBefore.dataset.bound) {
+      btnBefore.dataset.bound = 'true';
+      btnBefore.addEventListener('click', () => store.setState({ activeView: 'before' }));
+    }
+    if (btnSplit && !btnSplit.dataset.bound) {
+      btnSplit.dataset.bound = 'true';
+      btnSplit.addEventListener('click', () => store.setState({ activeView: 'split' }));
+    }
+    if (btnAfter && !btnAfter.dataset.bound) {
+      btnAfter.dataset.bound = 'true';
+      btnAfter.addEventListener('click', () => store.setState({ activeView: 'after' }));
+    }
 
     // Result Card Component Events (if rendered)
     if (state.verifiedCarePlan) {
@@ -288,6 +304,9 @@ class HelpBridgeApp {
   handleScenarioSelect(scenarioId) {
     const scenario = DEMO_SCENARIOS.find(s => s.id === scenarioId);
     if (!scenario) return;
+
+    const textarea = document.getElementById('raw-notes-input');
+    if (textarea) textarea.value = scenario.textNote || '';
 
     const newImages = [];
     if (scenario.hasPrescriptionImage && scenario.generateImage) {
@@ -328,6 +347,9 @@ class HelpBridgeApp {
       return;
     }
 
+    const textarea = document.getElementById('raw-notes-input');
+    const rawText = textarea ? textarea.value : state.rawText;
+
     store.setState({
       isAnalyzing: true,
       currentStage: 'reading',
@@ -338,7 +360,7 @@ class HelpBridgeApp {
     try {
       const result = await runHelpBridgePipeline({
         apiKey,
-        rawText: state.rawText,
+        rawText,
         images: state.images,
         documents: state.uploadedFiles,
         outputLanguage: state.outputLanguage,

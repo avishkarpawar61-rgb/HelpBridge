@@ -49,7 +49,8 @@ export function attachSummaryEvents(summaryText, outputLanguage) {
   const icon = document.getElementById('tts-icon');
   const textSpan = document.getElementById('tts-btn-text');
 
-  if (!btn) return;
+  if (!btn || btn.dataset.bound) return;
+  btn.dataset.bound = 'true';
 
   btn.addEventListener('click', () => {
     if (speechService.isSpeaking()) {

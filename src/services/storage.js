@@ -49,9 +49,11 @@ class AppStore {
     return this.state;
   }
 
-  setState(partialState) {
+  setState(partialState, silent = false) {
     this.state = { ...this.state, ...partialState };
-    this.notify();
+    if (!silent) {
+      this.notify();
+    }
   }
 
   subscribe(callback) {

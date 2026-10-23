@@ -123,19 +123,27 @@ export function attachAboutModalEvents() {
   const closeBtn = document.getElementById('close-about-modal-btn');
   const footerCloseBtn = document.getElementById('close-about-btn-footer');
 
-  if (openBtn && modal) {
-    openBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
-  }
+  if (modal && !modal.dataset.bound) {
+    modal.dataset.bound = 'true';
 
-  [closeBtn, footerCloseBtn].forEach(btn => {
-    if (btn && modal) {
-      btn.addEventListener('click', () => { modal.style.display = 'none'; });
+    if (openBtn) {
+      openBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
     }
-  });
 
-  if (modal) {
+    [closeBtn, footerCloseBtn].forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', () => { modal.style.display = 'none'; });
+      }
+    });
+
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.style.display = 'none';
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display !== 'none') {
+        modal.style.display = 'none';
+      }
     });
   }
 }

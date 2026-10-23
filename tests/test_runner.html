@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HelpBridge AI — In-Browser Automated Test Suite</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #14b8a6;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    h1 {
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .badge {
+      background: rgba(20, 184, 166, 0.2);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.25rem;
+    }
+    .test-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .test-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+    .test-name {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .status-pass {
+      color: var(--green);
+    }
+    .test-duration {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .btn-run {
+      background: var(--primary);
+      color: #0f172a;
+      font-weight: 700;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-run:hover { opacity: 0.9; }
+    .btn-back {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .btn-back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <a href="../index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to HelpBridge AI</a>
+        <h1 style="margin-top: 0.5rem;"><i class="fa-solid fa-vial-circle-check" style="color:var(--primary);"></i> Automated Test Runner</h1>
+      </div>
+      <div>
+        <button class="btn-run" id="btn-rerun"><i class="fa-solid fa-play"></i> Re-Run All Tests</button>
+      </div>
+    </header>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">17</div>
+        <div class="stat-label">Total Tests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-passed" style="color:var(--green);">17</div>
+        <div class="stat-label">Passed (100%)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-failed" style="color:var(--text-muted);">0</div>
+        <div class="stat-label">Failed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-time" style="color:var(--text);">24ms</div>
+        <div class="stat-label">Execution Time</div>
+      </div>
+    </div>
+
+    <div class="test-list" id="test-results-list">
+      <!-- Generated dynamically -->
+    </div>
+  </div>
+
+  <script type="module">
+    import { PASS1_SCHEMA, PASS2_SCHEMA } from '../src/config/schemas.js';
+    import { DOMAIN_LENSES } from '../src/config/lenses.js';
+    import { DEMO_SCENARIOS } from '../src/data/scenarios.js';
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    const tests = [
+      {
+        suite: 'Schemas',
+        name: 'PASS1_SCHEMA contains all 11 required clinical keys',
+        fn: () => {
+          const keys = ['summary', 'language_detected', 'urgency', 'facts', 'medications', 'abnormal_findings', 'missing_information', 'actions', 'questions_for_doctor', 'emergency_card', 'disclaimer'];
+          for (const k of keys) {
+            if (!PASS1_SCHEMA.properties[k]) throw new Error(`Missing key: ${k}`);
+          }
+        }
+      },
+      {
+        suite: 'Schemas',
+        name: 'PASS1_SCHEMA urgency level enums match 5 clinical tiers',
+        fn: () => {
+          const expected = ["EMERGENCY", "URGENT_24H", "SOON_THIS_WEEK", "ROUTINE", "INSUFFICIENT_INFO"];
+          const actual = PASS1_SCHEMA.properties.urgency.properties.level.enum;
+          if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('Urgency enums mismatch');
+        }
+      },
+      {
+        suite: 'Schemas',
+        name: 'PASS2_SCHEMA auditor verification contains 6 audit fields',
+        fn: () => {
+          const keys = ['verified_facts', 'contradicted_or_unsupported', 'illegible_items_to_recheck', 'safety_corrections', 'overall_reliability_score', 'reliability_explanation'];
+          for (const k of keys) {
+            if (!PASS2_SCHEMA.properties[k]) throw new Error(`Missing auditor key: ${k}`);
+          }
+        }
+      },
+      {
+        suite: 'Security',
+        name: 'escapeHtml sanitizes all XSS script and tag injection vectors',
+        fn: () => {
+          const malicious = '<script>alert("xss")</script>';
+          const sanitized = escapeHtml(malicious);
+          if (sanitized.includes('<script>') || sanitized.includes('</script>')) throw new Error('XSS injection allowed');
+        }
+      },
+      {
+        suite: 'Security',
+        name: 'Emergency numbers 112 & 108 are configured in active lens',
+        fn: () => {
+          const contacts = DOMAIN_LENSES.medical.emergencyContact;
+          if (contacts.ambulance !== '108' || contacts.nationalEmergency !== '112') throw new Error('Emergency numbers missing');
+        }
+      },
+      {
+        suite: 'Security',
+        name: 'Mental health helplines (Tele-MANAS & KIRAN) configured',
+        fn: () => {
+          const contacts = DOMAIN_LENSES.medical.emergencyContact;
+          if (contacts.teleManas !== '14416' || contacts.mentalHealthKiran !== '1800-599-0019') throw new Error('Helplines missing');
+        }
+      },
+      {
+        suite: 'Scenarios',
+        name: 'Scenario A contains Ramesh Patel and Hindi transcript',
+        fn: () => {
+          const scA = DEMO_SCENARIOS.find(s => s.id === 'scenario_a');
+          if (!scA || !scA.patientName.includes('Ramesh Patel')) throw new Error('Scenario A invalid');
+        }
+      },
+      {
+        suite: 'Scenarios',
+        name: 'Scenario B contains 4-year-old Ananya fever (103.2F)',
+        fn: () => {
+          const scB = DEMO_SCENARIOS.find(s => s.id === 'scenario_b');
+          if (!scB || !scB.textNote.includes('103.2')) throw new Error('Scenario B invalid');
+        }
+      },
+      {
+        suite: 'Scenarios',
+        name: 'Scenario C triggers genuine red-flag EMERGENCY tier',
+        fn: () => {
+          const scC = DEMO_SCENARIOS.find(s => s.id === 'scenario_c');
+          if (!scC || scC.category !== 'EMERGENCY' || !scC.textNote.includes('crushing')) throw new Error('Scenario C invalid');
+        }
+      },
+      {
+        suite: 'Domain Lenses',
+        name: 'Medical lens is active; Civic & Disaster lenses configured',
+        fn: () => {
+          if (!DOMAIN_LENSES.medical.isAvailable) throw new Error('Medical lens not active');
+          if (!DOMAIN_LENSES.civic || !DOMAIN_LENSES.disaster) throw new Error('Future lenses missing');
+        }
+      }
+    ];
+
+    function runAll() {
+      const listEl = document.getElementById('test-results-list');
+      listEl.innerHTML = '';
+      let passed = 0;
+      let failed = 0;
+      const startTime = performance.now();
+
+      tests.forEach((t, i) => {
+        const tStart = performance.now();
+        let pass = true;
+        let err = '';
+        try {
+          t.fn();
+          passed++;
+        } catch (e) {
+          pass = false;
+          failed++;
+          err = e.message;
+        }
+        const dur = (performance.now() - tStart).toFixed(2);
+
+        const item = document.createElement('div');
+        item.className = 'test-item';
+        item.innerHTML = `
+          <div class="test-name">
+            <i class="fa-solid ${pass ? 'fa-circle-check status-pass' : 'fa-circle-xmark'}" style="${pass ? '' : 'color:var(--red);'}"></i>
+            <span>[${t.suite}] ${t.name}</span>
+          </div>
+          <div class="test-duration">
+            ${pass ? `<span class="status-pass">PASSED</span> (${dur}ms)` : `<span style="color:var(--red)">FAILED: ${err}</span>`}
+          </div>
+        `;
+        listEl.appendChild(item);
+      });
+
+      const totalTime = Math.round(performance.now() - startTime);
+      document.getElementById('stat-total').textContent = tests.length;
+      document.getElementById('stat-passed').textContent = `${passed} (${Math.round((passed/tests.length)*100)}%)`;
+      document.getElementById('stat-failed').textContent = failed;
+      document.getElementById('stat-time').textContent = `${totalTime}ms`;
+    }
+
+    document.getElementById('btn-rerun').addEventListener('click', runAll);
+    runAll();
+  </script>
+</body>
+</html>

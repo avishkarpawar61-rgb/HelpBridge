@@ -48,8 +48,8 @@ export function renderRawBeforePanel({ rawText, images = [], documents = [] }) {
         <div class="raw-images-grid">
           ${images.map(img => `
             <div class="raw-image-card">
-              <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}" class="raw-preview-thumb" />
-              <div class="raw-image-caption">${escapeHtml(img.name)} (${Math.round((img.sizeBytes || 0) / 1024)} KB)</div>
+              <img src="${img.dataUrl}" alt="${escapeHtml(img.name || 'Raw medical document thumbnail')}" class="raw-preview-thumb" />
+              <div class="raw-image-caption">${escapeHtml(img.name || 'Medical document')} (${Math.round((img.sizeBytes || 0) / 1024)} KB)</div>
             </div>
           `).join('')}
         </div>

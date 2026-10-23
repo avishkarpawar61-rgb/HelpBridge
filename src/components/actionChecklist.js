@@ -72,7 +72,8 @@ export function renderActionChecklist(actions = [], completedSet = new Set()) {
 
 export function attachActionChecklistEvents() {
   const list = document.getElementById('action-items-list');
-  if (!list) return;
+  if (!list || list.dataset.bound) return;
+  list.dataset.bound = 'true';
 
   list.addEventListener('change', (e) => {
     if (e.target && e.target.classList.contains('action-checkbox')) {

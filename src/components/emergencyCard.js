@@ -122,6 +122,9 @@ export function attachEmergencyCardEvents(cardData, urgencyLevel) {
   const copyText = document.getElementById('copy-card-text');
   const shareBtn = document.getElementById('share-card-btn');
 
+  if (printBtn && printBtn.dataset.bound) return;
+  if (printBtn) printBtn.dataset.bound = 'true';
+
   const textSummary = generateTextSummary(cardData, urgencyLevel);
 
   if (printBtn) {

@@ -41,7 +41,8 @@ export function attachQuestionsEvents(questions = []) {
   const btn = document.getElementById('copy-questions-btn');
   const btnText = document.getElementById('copy-btn-text');
 
-  if (!btn || questions.length === 0) return;
+  if (!btn || btn.dataset.bound || questions.length === 0) return;
+  btn.dataset.bound = 'true';
 
   btn.addEventListener('click', async () => {
     const textToCopy = questions.map((q, i) => `${i + 1}. ${q}`).join('\n');

@@ -90,7 +90,8 @@ export function attachFollowUpEvents(verifiedCarePlan) {
   const input = document.getElementById('follow-up-input');
   const suggestionsRow = document.getElementById('chat-suggestions-row');
 
-  if (suggestionsRow) {
+  if (suggestionsRow && !suggestionsRow.dataset.bound) {
+    suggestionsRow.dataset.bound = 'true';
     suggestionsRow.addEventListener('click', (e) => {
       if (e.target && e.target.classList.contains('chat-suggestion-chip')) {
         const text = e.target.textContent;
@@ -102,11 +103,13 @@ export function attachFollowUpEvents(verifiedCarePlan) {
     });
   }
 
-  if (form) {
+  if (form && !form.dataset.bound) {
+    form.dataset.bound = 'true';
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const text = input ? input.value.trim() : '';
       if (!text) return;
+      input.value = '';
       submitQuestion(text);
     });
   }

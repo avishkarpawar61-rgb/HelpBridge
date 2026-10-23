@@ -147,7 +147,10 @@ export function attachFactsEvents(facts = [], onFilterChange) {
     document.getElementById('close-modal-footer-btn')
   ];
 
-  if (tableBody && modal && modalContent) {
+  if (tableBody && modal && modalContent && !tableBody.dataset.bound) {
+    tableBody.dataset.bound = 'true';
+    
+    // Mouse click
     tableBody.addEventListener('click', (e) => {
       const row = e.target.closest('.fact-row');
       if (row) {
@@ -159,12 +162,32 @@ export function attachFactsEvents(facts = [], onFilterChange) {
       }
     });
 
+    // Keyboard navigation (Enter / Space) for WCAG AA compliance
+    tableBody.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const row = e.target.closest('.fact-row');
+        if (row) {
+          e.preventDefault();
+          const factId = row.dataset.factId;
+          const fact = facts.find(f => f.id === factId);
+          if (fact) openFactModal(fact);
+        }
+      }
+    });
+
     closeBtns.forEach(btn => {
       if (btn) btn.addEventListener('click', () => { modal.style.display = 'none'; });
     });
 
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.style.display = 'none';
+    });
+
+    // Close on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display !== 'none') {
+        modal.style.display = 'none';
+      }
     });
   }
 

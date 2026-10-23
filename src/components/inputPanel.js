@@ -41,9 +41,9 @@ export function renderInputPanel(state) {
       <div class="attached-thumbnails-strip" id="images-preview-strip">
         ${state.images.map(img => `
           <div class="thumb-card" data-img-id="${img.id}">
-            <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}" class="thumb-img" />
+            <img src="${img.dataUrl}" alt="${escapeHtml(img.name || 'Medical document photo')}" class="thumb-img" />
             <button type="button" class="btn-remove-thumb" data-img-id="${img.id}" title="Remove image" aria-label="Remove image">&times;</button>
-            <div class="thumb-caption">${escapeHtml(img.name)}</div>
+            <div class="thumb-caption">${escapeHtml(img.name || 'Document photo')}</div>
           </div>
         `).join('')}
       </div>
@@ -250,11 +250,12 @@ export function attachInputPanelEvents(handlers) {
     });
   });
 
-  // Textarea input sync
+  // Textarea input sync - silent update avoids destroying focus and cursor position
   const textarea = document.getElementById('raw-notes-input');
-  if (textarea) {
+  if (textarea && !textarea.dataset.bound) {
+    textarea.dataset.bound = 'true';
     textarea.addEventListener('input', (e) => {
-      store.setState({ rawText: e.target.value });
+      store.setState({ rawText: e.target.value }, true);
     });
   }
 
